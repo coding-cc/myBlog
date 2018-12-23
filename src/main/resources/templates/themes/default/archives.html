@@ -1,0 +1,24 @@
+<!--suppress ThymeleafVariablesResolveInspection-->
+<th:block th:replace="themes/default/partial/header.html::header" xmlns:th="http://www.thymeleaf.org"></th:block>
+<div class="main-content archive-page clearfix" xmlns:th="http://www.thymeleaf.org">
+    <div class="categorys-item">
+        <div class="post-lists">
+            <div class="post-lists-body">
+                <div th:each="article:${articles}" class="post-list-item">
+                    <div class="post-list-item-container">
+                        <div class="item-label">
+                            <div class="item-title">
+                                <a th:href="@{'/article/' + ${article.cid}}" th:text="${article.title}"></a>
+                            </div>
+                            <div class="item-meta clearfix">
+                                <div class="item-meta-date"><th:block th:text="'发布于 '+${#dates.format(article.created, 'yyyy-MM-dd')}"></th:block></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="themes/default/partial/footer.html::footer" xmlns:th="http://www.thymeleaf.org"></th:block>
+

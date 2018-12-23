@@ -1,0 +1,32 @@
+<th:block th:include="themes/default/partial/header.html :: header" xmlns:th="http://www.thymeleaf.org"></th:block>
+<div class="main-content common-page clearfix" xmlns:th="http://www.thymeleaf.org">
+    <div class="categorys-item">
+        <div class="common-title">
+            <th:block th:text="${type}"></th:block>: <th:block th:text="${keyword}"></th:block>
+        </div>
+        <div th:if="${articles != null && articles.getContent().size()==0}">
+            <p>抱歉，还没有相关文章.</p>
+        </div>
+        <div class="post-lists">
+            <div class="post-lists-body">
+                <th:block th:if="null != ${articles}">
+                <div th:each="article: ${articles}" class="post-list-item">
+                    <div class="post-list-item-container ">
+                        <div class="item-label ">
+                            <div class="item-title">
+                                <a th:href="@{'/article/'+${article.cid}}" th:text="${article.title}"></a>
+                            </div>
+                            <div class="item-meta clearfix">
+                                <div class="item-meta-ico ${show_icon()}"
+                                     style="background: url(/templates/themes/default/static/img/bg-ico.png) no-repeat;background-size: 40px auto;"></div>
+                                <div class="item-meta-date" th:text="'发布于 '+${#dates.format(article.created, 'yyyy-MM-dd')}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:include="themes/default/partial/footer.html :: footer" id="footer" xmlns:th="http://www.thymeleaf.org"></th:block>

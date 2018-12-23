@@ -1,0 +1,237 @@
+<th:block th:include="admin/header.html :: header" xmlns:th="http://www.thymeleaf.org"></th:block>
+<div id="app" class="row" v-cloak  xmlns:th="http://www.thymeleaf.org">
+    <loading :active.sync="isLoading" :can-cancel="true"></loading>
+    <div class="col-lg-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Tale仪表盘</h3>
+            </div>
+            <div class="panel-body">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mini-stat clearfix bx-shadow bg-info">
+                            <a href="/cc/articles" class="text-white">
+                                <span class="mini-stat-icon"><i class="fa fa-quote-right" aria-hidden="true"></i></span>
+                            </a>
+                            <div class="mini-stat-info text-right">
+                                发表了<span th:text="${count}" class="counter"></span>篇文章
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mini-stat clearfix bg-purple bx-shadow">
+                            <a href="/cc/comments" class="text-white">
+                                <span class="mini-stat-icon"><i class="fa fa-comments-o" aria-hidden="true"></i></span>
+                            </a>
+                            <div class="mini-stat-info text-right">
+                                收到了<span class="counter">{{comments.totalElements}}</span>条留言
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mini-stat clearfix bg-success bx-shadow">
+                            <a href="/cc/attaches" class="text-white">
+                                <span class="mini-stat-icon"><i class="fa fa-cloud-upload" aria-hidden="true"></i></span>
+                            </a>
+                            <div class="mini-stat-info text-right">
+                                上传了
+                                <span th:text="${attachList.size()}" class="counter"></span>
+                                个附件
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">最新文章</h4>
+                            </div>
+                            <div class="panel-body">
+                                <ul th:each="article : ${articleList}" class="list-group">
+
+                                    <li class="list-group-item">
+                                    <span class="badge badge-primary"
+                                  th:title="${article.commentsNum}+'条评论'" th:text="${article.commentsNum}"></span>
+                                        <a target="_blank" th:text="${article.title}" th:href="@{'/article/' + ${article.cid}}"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">最新留言</h4>
+                            </div>
+                            <div class="panel-body">
+                                <div v-if="comments.totalElements == 0" class="alert alert-warning">
+                                    还没有收到留言.
+                                </div>
+
+                                <div v-if="comments.totalElements > 0" class="inbox-widget nicescroll mx-box" tabindex="5000" style="overflow: hidden; outline: none;">
+                                    <div class="inbox-item" v-for="item in comments.content">
+                                        <div class="inbox-item-img">
+                                            <a :href="item.url" target="_blank">
+                                                <img :src="item.mail | gravatar" class="img-circle" :alt="item.author">
+                                            </a>
+                                        </div>
+                                        <p class="inbox-item-author">
+                                            <a :href="item.url" target="_blank">{{item.author}}</a>
+                                        </p>
+                                        <p class="inbox-item-text">
+                                            <a :href="/article/ + item.cid + '#comments'" target="_blank">
+                                                {{item.content}}
+                                            </a>
+                                        </p>
+                                        <p class="inbox-item-date">{{item.created | formatUnix('MM月DD日 HH:mm')}}</p>
+                                        <p v-if="item.status == 'no_audit'" class="pull-right">
+                                            <button class="btn btn-sm btn-success" @click="audit(item.coid, 'approved')">通过</button>
+                                            <button class="btn btn-sm btn-danger" @click="deleteComment(item.coid)">删除</button>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">系统日志</h4>
+                            </div>
+                            <div class="panel-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item" v-for="item in logPage">
+                                        <span>{{item.created | formatUnix}} &nbsp;&nbsp;<kbd>{{item.action}}</kbd></span>
+                                    </li>
+                                </ul>
+                                <ul class="pager">
+                                    <li v-if="logPage.hasPrevPage">
+                                        <a @click="load(logPage.prevPage)"> <i class="fa fa-angle-double-left"></i> 上一页</a>
+                                    </li>
+                                    <li v-if="logPage.hasNextPage">
+                                        <a @click="load(logPage.nextPage)">下一页 <i class="fa fa-angle-double-right"></i> </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/footer.html :: footer" xmlns:th="http://www.thymeleaf.org"></th:block>
+<script >
+    var tale = new $.tale();
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            logPage: {},
+            comments:{},
+            isLoading: true,
+            noAuditComments: []
+        },
+        beforeCreate: function () {
+            vueLoding = this.$loading.show();
+        },
+        mounted: function () {
+            this.load(1);
+        },
+        methods: {
+            load: function (page) {
+                var $vm = this;
+                tale.get({
+                    url: '/cc/logs',
+                    success: function (data) {
+                        if(data.code==200){
+                            $vm.logPage = data.data.content
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error);
+                        alert(error || '数据加载失败');
+                    }
+                });
+                tale.get({
+                    url: '/cc/comments/1',
+                    success: function (data) {
+                        //未审核的评论显示在上面
+                            // $vm.comments = data.data
+                            // var temp = $vm.comments.content
+                            // $vm.noAuditComments = temp.filter(function (item) {
+                            //     if(item.status=='no_audit'){
+                            //         var index = temp.indexOf(item)
+                            //         temp.splice(index, 1)
+                            //         return item
+                            //     }
+                            // })
+                            // $vm.comments.content=$vm.noAuditComments.concat(temp)
+                        var noAudit = data.data.content.filter(function (item) {
+                            if(item.status=='no_audit') {
+                                return item
+                            }
+                        })
+                        var approved = data.data.content.filter(function (item) {
+                            if(item.status=='approved') {
+                                return item
+                            }
+                        })
+                        data.data.content = noAudit.concat(approved)
+                        $vm.comments = data.data
+                    },
+                    error: function (error) {
+                        console.log(error);
+                        alert(error || '数据加载失败');
+                    }
+                });
+            },
+            audit: function(coid, status){
+                var $vm = this;
+                tale.post({
+                    url : '/cc/comment/status?coid='+coid,
+                    success: function (result) {
+                        if(result && result.code==200){
+                            tale.alertOk('已通过');
+                            $vm.load();
+                        } else {
+                            tale.alertError(result.msg || '评论设置失败');
+                        }
+                    }
+                });
+            },
+            deleteComment: function (coid) {
+                var $vm = this;
+                tale.alertConfirm({
+                    title: '确定删除该评论吗?',
+                    then: function () {
+                        tale.post({
+                            url: '/cc/comment/delete?coid=' + coid,
+                            success: function (result) {
+                                if (result && result.code==200) {
+                                    tale.alertOk('评论删除成功');
+                                    $vm.load();
+                                } else {
+                                    tale.alertError(result.msg || '评论删除失败');
+                                }
+                            }
+                        });
+                    }
+                });
+            },
+        },
+        computed: {
+        }
+    });
+
+    $(document).ready(function () {
+        vm.isLoading = false;
+        vueLoding.hide();
+    });
+</script>
+</body>
+</html>

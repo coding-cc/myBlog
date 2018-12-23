@@ -1,0 +1,44 @@
+<!--suppress ThymeleafVariablesResolveInspection-->
+<th:block th:include="themes/default/partial/header.html :: header" xmlns:th="http://www.thymeleaf.org"></th:block>
+<div class="main-content index-page clearfix"  xmlns:th="http://www.thymeleaf.org">
+    <div class="post-lists">
+        <div class="post-lists-body" th:each="article:${articles}">
+            <div class="post-list-item">
+                <div class="post-list-item-container">
+                    <div class="item-thumb bg-deepgrey" th:style="'background: url('+'/themes/default/static/img/rand/'+${article.cid%19}+'.jpg)'"></div>
+                    <a th:href="@{'article/' + ${article.cid}}"><!--<a th:href="${article.cid}">-->
+                        <div class="item-desc">
+                            <input type="hidden" id="cid" th:value="${article.cid}">
+                            <p th:text="${article.content}"></p>
+                        </div>
+                    </a>
+                    <div class="item-slant reverse-slant bg-deepgrey"></div>
+                    <div class="item-slant"></div>
+                    <div class="item-label">
+                        <div class="item-title"><a th:href="@{'article/' + ${article.cid}}" th:text="${article.title}"></a>
+                        </div>
+                        <div class="item-meta clearfix">
+                            <div class="item-meta-ico ${show_icon()}"
+                                 style="background: url(/templates/themes/default/static/img/bg-ico.png) no-repeat;background-size: 40px auto;"></div>
+                            <div class="item-meta-cat">
+                                <a th:href="@{'/category/'+${article.categories}}" th:text="${article.categories}"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="lists-navigator clearfix">
+        <ol class="page-navigator">
+            <!--/* articles.getPageable().getPageNumber() 是从0开始的 所以... */-->
+            <li th:if="${articles.hasPrevious()}" class="prev"><a th:href="@{'?page='+${articles.getPageable().getPageNumber()}}">←</a></li>
+            <li th:each="index:${#numbers.sequence(1, articles.getTotalPages())}" th:class="${index==articles.getPageable().getPageNumber()+1?'current':'no'}">
+                <a th:if="${index > 0}" th:href="@{'?page='+${index}}" th:text="${index}"></a>
+            </li>
+            <li th:if="${articles.hasNext()}" class="prev"><a th:href="@{'?page='+${articles.getPageable().getPageNumber() + 2}}">➙</a></li>
+        </ol>
+
+    </div>
+</div>
+<th:block th:include="themes/default/partial/footer.html :: footer" id="footer" xmlns:th="http://www.thymeleaf.org"></th:block>
