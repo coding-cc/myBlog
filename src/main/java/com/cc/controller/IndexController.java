@@ -19,13 +19,6 @@ import java.util.List;
 @Controller
 public class IndexController {
 
-    @PostMapping(value = "github-webhook")
-    @ResponseBody
-
-    public  String  webHook(){
-        return "success?";
-    }
-
     @Autowired
     private ContentService contentService;
 
