@@ -22,7 +22,7 @@ public class IndexController {
     @PostMapping(value = "github-webhook")
     @ResponseBody
     public  String  webHook(){
-        return "success";
+        return "success?";
     }
 
     @Autowired
