@@ -26,7 +26,7 @@ public class IndexController {
     }
 
     @Autowired
-    private ContentService contentService;
+    private  ContentService contentService;
 
     @GetMapping(value = "/")
     public String index(HttpServletRequest request,
