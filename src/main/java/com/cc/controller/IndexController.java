@@ -19,14 +19,14 @@ import java.util.List;
 @Controller
 public class IndexController {
 
-    @PostMapping(value = "webHook")
+    @PostMapping(value = "github-webhook")
     @ResponseBody
     public  String  webHook(){
-        return  "success";
+        return "success";
     }
 
     @Autowired
-    private     ContentService  contentService;
+    private ContentService contentService;
 
     @GetMapping(value = "/")
     public String index(HttpServletRequest request,
