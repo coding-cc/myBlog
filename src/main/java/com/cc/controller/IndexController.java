@@ -22,6 +22,7 @@ public class IndexController {
     @Autowired
     private ContentService contentService;
 
+
     @GetMapping(value = "/")
     public String index(HttpServletRequest request,
                         @RequestParam(defaultValue = "1") int page,
