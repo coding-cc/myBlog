@@ -7,9 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -20,6 +18,12 @@ import java.util.List;
  */
 @Controller
 public class IndexController {
+
+    @PostMapping(value = "webHook")
+    @ResponseBody
+    public String webHook(){
+        return "success";
+    }
 
     @Autowired
     private ContentService contentService;

@@ -27,11 +27,11 @@
         <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
         <script type="text/javascript" th:src="@{'/admin/js/jquery.js'}"></script>
         <script type="text/javascript" th:src="@{'/admin/js/jquery-ui-1.8.11.custom.min.js'}"></script>
-        <script type="text/javascript" th:src="@{'/admin/js/soundmanager2-jsmin.js'}"></script>
+        <!--<script type="text/javascript" th:src="@{'/admin/js/soundmanager2-jsmin.js'}"></script>-->
         <script type="text/javascript" th:src="@{'/admin/js/jquery.julienMP3Player.js'}"></script>
 
     </head>
-    <script type="text/javascript">
+    <!--<script type="text/javascript">
         var SM2_DEFER = true;
         $(function(){
             $('#player').julienMP3Player({
@@ -41,19 +41,16 @@
                 autoplay: true
             });
         });
-    </script>
+    </script>-->
     <header id="header" class="header bg-white">
         <div class="navbar-container">
             <a href="" class="navbar-logo">
                 <img src="/themes/default/static/img/logo.png" alt="${site_title()}"/>
             </a>
-            <ul id="player">
-                <li><a href="http://localhost:8080/admin/media/EWNC.mp3">cow</a></li>
-            </ul>
             <div class="navbar-menu">
                 <a href="/archives">归档</a>
                 <!--<a href="/links">友链</a>-->
-                <a href="/about">关于</a>
+                <!--<a href="/about">关于</a>-->
             </div>
             <div class="navbar-search" onclick="">
                 <span class="icon-search"></span>
@@ -69,7 +66,7 @@
                 <ul>
                     <li><a href="/archives">归档</a></li>
                     <!--<li><a href="/links">友链</a></li>-->
-                    <li><a href="/about">关于</a></li>
+                    <!--<li><a href="/about">关于</a></li>-->
                 </ul>
             </div>
         </div>

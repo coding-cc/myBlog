@@ -27,7 +27,7 @@
                             <tbody>
                             <tr v-for="item in linkPage.content">
                                 <td>{{ item.title }}</td>
-                                <td>{{ item.slug }}</td>
+                                <td>/{{ item.slug!=''?item.slug:item.cid }}</td>
                                 <td>{{ item.created | formatUnix }}</td>
                                 <td>
                                     <span v-show="item.status == 'publish'">已发布</span>
