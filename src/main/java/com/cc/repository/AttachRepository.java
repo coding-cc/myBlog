@@ -1,6 +1,8 @@
 package com.cc.repository;
 
 import com.cc.model.entity.Attach;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -11,4 +13,5 @@ import java.util.List;
  */
 public interface AttachRepository extends JpaRepository<Attach, Integer> {
     List<Attach>findByAuthorId(Integer id);
+    Page <Attach> findByAuthorId(Integer id, Pageable pageable);
 }

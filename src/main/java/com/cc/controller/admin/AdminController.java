@@ -7,7 +7,6 @@ import com.cc.model.entity.*;
 import com.cc.model.form.UserForm;
 import com.cc.service.*;
 import com.cc.utils.ResultUtils;
-import com.google.gson.Gson;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -19,11 +18,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author : cc
@@ -41,7 +44,7 @@ public class AdminController {
     private final CategoryService categoryService;
     private final MetaService metaService;
 
-    @Autowired
+
     public AdminController(LogService logService,
                            ContentService contentService,
                            CommentsService commentsService,
@@ -123,6 +126,7 @@ public class AdminController {
         Page<Comments> commentsPage = commentsService.findAllByAuId(1, PageRequest.of(page - 1, 999));
         return ResultUtils.success(commentsPage);
     }
+
 
     @GetMapping(value = "article/edit/{cid}")
     public String editArticle(@PathVariable(value = "cid") Integer cid) {
@@ -239,12 +243,9 @@ public class AdminController {
 
     @GetMapping(value = "attaches/{authId}")
     @ResponseBody
-    public String attaches(@PathVariable(value = "authId") Integer id) {
-        List<Attach> allContents = attachService.findAllByAuthid(id);
-        //TODO
-        Gson gson = new Gson();
-        String s = gson.toJson(allContents);
-        return s;
+    public ResultVO attaches(@PathVariable(value = "authId") Integer id, @RequestParam(defaultValue = "1") Integer page) {
+        Page<Attach> allContents = attachService.findAllByAuthid(id, PageRequest.of(page-1, 6));
+        return ResultUtils.success(allContents);
     }
 
     @GetMapping(value = "attaches")
@@ -355,4 +356,41 @@ public class AdminController {
         return ResultUtils.error(500, "该标签已存在");
     }
 
+    @PostMapping(value = "attach/delete/{id}")
+    @ResponseBody
+    public ResultVO delAttach(@PathVariable(value = "id") Integer id) {
+        attachService.deleteOne(id);
+        return ResultUtils.success();
+    }
+    @PostMapping(value = "/uploadShapeIcon")
+    @ResponseBody
+    public String uploadShapeIcon(MultipartFile file) throws Exception {
+
+        if (file == null) {
+            return "failed";
+        }
+        String fileName = file.getOriginalFilename();
+        String suffixName = fileName.substring(fileName.lastIndexOf("."));
+        fileName = UUID.randomUUID().toString().replaceAll("-","") + suffixName;
+        String separator = File.separator;
+        File path = new File(ResourceUtils.getURL("classpath:").getPath());
+        File upDir = new File(path.getAbsolutePath(), "static" + separator + "upload");
+
+        if (!upDir.exists()) {
+            upDir.mkdirs();
+        }
+
+        File tar = new File(upDir + separator + fileName);
+        file.transferTo(tar);
+
+        Attach attach = new Attach();
+        attach.setFname(fileName);
+        attach.setAuthorId(1);
+        attach.setFtype("image");
+        attach.setUrl("/static/upload/"+fileName);
+        attach.setCreated(new Date());
+        attachService.save(attach);
+
+        return "succeed";
+    }
 }

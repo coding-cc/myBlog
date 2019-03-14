@@ -3,9 +3,8 @@ package com.cc.model.entity;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author : cc
@@ -17,11 +16,12 @@ import javax.persistence.Table;
 public class Attach{
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String  fname;
     private String  ftype;
-    private String  fkey;
+    private String  url;
     private Integer authorId;
-    private Integer created;
+    private Date created;
 
 }

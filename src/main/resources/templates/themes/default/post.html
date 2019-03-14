@@ -1,4 +1,9 @@
+<!--suppress ThymeleafVariablesResolveInspection-->
 <th:block th:include="themes/default/partial/header.html :: header" xmlns:th="http://www.thymeleaf.org"></th:block>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/showdown/1.3.0/showdown.min.js"></script>
+<script type="text/javascript">
+</script>
 <article class="main-content page-page" itemscope itemtype="http://schema.org/Article"
          xmlns:th="http://www.thymeleaf.org">
     <div class="post-header">
@@ -23,8 +28,7 @@
             </th:block>
             <a th:if="${article.tags == ''}" th:href="@{'/tag/' + 'def'}">-_-</a>
         </p>
-        <!--<pre><code class="java" th:utext="${article.content}"></code></pre>-->
-        <pre><code class="java" th:utext="${article.content}"></code></pre>
+        <th:block th:utext="${article.content}"></th:block>
         <p class="post-info">
             本文最后修改时间:<i th:text="${#dates.format(article.modified,'yyyy-MM-dd')}"></i>
         </p>

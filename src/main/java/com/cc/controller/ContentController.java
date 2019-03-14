@@ -6,6 +6,15 @@ import com.cc.model.entity.Contents;
 import com.cc.service.CommentsService;
 import com.cc.service.ContentService;
 import com.cc.utils.ResultUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.commonmark.Extension;
+import org.commonmark.ext.gfm.tables.TablesExtension;
+import org.commonmark.node.Link;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.AttributeProvider;
+import org.commonmark.renderer.html.HtmlRenderer;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -28,6 +40,7 @@ import java.util.concurrent.TimeUnit;
  * @date : 2018-09-18  16:00
  */
 @Controller
+@Slf4j
 public class ContentController {
 
     @Autowired
@@ -45,7 +58,10 @@ public class ContentController {
                           HttpServletRequest request, ModelMap modelMap) {
         String ip = request.getRemoteAddr();
         Contents c = contentService.findById(cid);
-        modelMap.addAttribute("article", c);
+        Contents dto = new Contents();
+        BeanUtils.copyProperties(c, dto);
+        modelMap.addAttribute("article", dto);
+        mdToHTML(dto);
         modelMap.addAttribute("articles", contentService.findAllByAuthorIdAndType(1, "post"));
         modelMap.addAttribute("currentPage", page);
         modelMap.addAttribute("comments", commentsService.findAllByArticleId(cid, PageRequest.of(page - 1, size)));
@@ -53,6 +69,7 @@ public class ContentController {
         try {
             token = redisTemplate.opsForValue().get("HIT_" + cid + ":" + ip);
         } catch (Exception e){
+            log.error("[redis连接异常], {}", e.getMessage());
             return "themes/default/post.html";
         }
         //获取今天还剩多少秒
@@ -66,6 +83,29 @@ public class ContentController {
         }
         return "themes/default/post.html";
     }
+
+    private void mdToHTML(Contents c) {
+
+        List<Extension> extensions = Arrays.asList(TablesExtension.create());
+        Parser parser     = Parser.builder().extensions(extensions).build();
+        Node document   = parser.parse(c.getContent());
+        HtmlRenderer renderer = HtmlRenderer.builder()
+                .attributeProviderFactory(context -> new LinkAttributeProvider())
+                .extensions(extensions).build();
+
+        String content = renderer.render(document);
+        c.setContent(content);
+    }
+
+    class LinkAttributeProvider implements AttributeProvider {
+        @Override
+        public void setAttributes(Node node, String tagName, Map<String, String> attributes) {
+            if (node instanceof Link) {
+                attributes.put("target", "_blank");
+            }
+        }
+    }
+
 
     @PostMapping(value = "/comment")
     @ResponseBody
