@@ -1,14 +1,11 @@
 spring:
-  servlet:
-    multipart:
-      max-file-size: 10MB
   redis:
-    host: 192.168.119.130
+    host: 127.0.0.1
     port: 6379
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     username: root
-    password: root
+    password: jcc123456
     url: jdbc:mysql://127.0.0.1/blog?characterEncoding=utf-8&useSSL=false
   resources:
     static-locations:
@@ -31,7 +28,6 @@ spring:
 server:
   tomcat:
     uri-encoding: UTF-8
-  port: 8080
 # Shiro
 shiro:
   user:
