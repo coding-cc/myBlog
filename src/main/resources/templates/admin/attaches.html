@@ -79,7 +79,7 @@
                     <div class="col-md-2 col-xs-6 text-center m-t-10" v-for="item in attachPage">
                         <div class="img-show">
                         <a :href="item.url" target="_blank">
-                            <img v-if="item.ftype == 'image'" class="attach-img" :src="item.url" :title="item.fname"/>
+                            <img v-if="item.ftype == 'image'" class="attach-img" :src="'/myImg'+item.url" :title="item.fname"/>
                             <img v-if="item.ftype != 'image'" class="attach-img" src="/static/admin/images/attach.png" :title="item.fname"/>
                         </a>
                         </div>

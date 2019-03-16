@@ -373,8 +373,8 @@ public class AdminController {
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
         fileName = UUID.randomUUID().toString().replaceAll("-","") + suffixName;
         String separator = File.separator;
-        File path = new File(ResourceUtils.getURL("classpath:").getPath());
-        File upDir = new File(path.getAbsolutePath(), "static" + separator + "upload");
+        File path = new File(ResourceUtils.getURL("").getPath());
+        File upDir = new File(path, "static" + separator + "upload");
 
         if (!upDir.exists()) {
             upDir.mkdirs();
