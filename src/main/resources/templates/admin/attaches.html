@@ -78,7 +78,7 @@
 
                     <div class="col-md-2 col-xs-6 text-center m-t-10" v-for="item in attachPage">
                         <div class="img-show">
-                        <a :href="item.url" target="_blank">
+                        <a :href="'/myImg'+item.url" target="_blank">
                             <img v-if="item.ftype == 'image'" class="attach-img" :src="'/myImg'+item.url" :title="item.fname"/>
                             <img v-if="item.ftype != 'image'" class="attach-img" src="/static/admin/images/attach.png" :title="item.fname"/>
                         </a>
@@ -87,7 +87,7 @@
                             <span class="attach-text" data-toggle="tooltip" data-placement="top" :data-original-title="item.fname">{{item.fname | truncate(15)}}</span>
                         </div>
                         <div class="clearfix">
-                            <button :src="item.url" type="button"
+                            <button :src="'/myImg'+item.url" type="button"
                                     class="btn btn-warning btn-sm waves-effect waves-light m-t-5 copy">
                                 <i class="fa fa-copy"></i> <span>复制</span>
                             </button>
@@ -149,8 +149,6 @@
                     url: '/cc/attaches/1',
                     success: function (data) {
                         $vm.attachPage = data.data.content
-                        console.log(data.data)
-                        console.log($vm.attachPage)
                     },
                     error: function (error) {
                         console.log(error);
@@ -182,37 +180,6 @@
 
     Dropzone.autoDiscover = false;
 
-    /*$("#dropzone").dropzone({
-        url: "/admin/api/attach/upload",
-        filesizeBase: 1024,//定义字节算法 默认1000
-        maxFiles: $.constant().MAX_FILES,//最大文件数量
-        maxFilesize: '${maxFileSize()}', //MB
-        fallback: function () {
-            tale.alertError('暂不支持您的浏览器上传!');
-        },
-        uploadMultiple: true,
-        dictFileTooBig: '您的文件超过' + /!*${max_file_size}*!/8 +'MB!',
-        dictInvalidInputType: '不支持您上传的类型',
-        dictMaxFilesExceeded: '您的文件超过' + /!*$.constant().MAX_FILES*!/8 + '个!',
-        headers: {
-            'X-CSRF-TOKEN': document.getElementById("csrf_token").content
-        },
-        init: function () {
-            this.on('queuecomplete', function (files) {
-                tale.alertOk('上传成功');
-                vm.load();
-            });
-            this.on('error', function (a, errorMessage, result) {
-                if (!result.success && result.msg) {
-                    tale.alertError(result.msg || '上传失败');
-                }
-            });
-            this.on('maxfilesreached', function () {
-                this.removeAllFiles(true);
-                tale.alertWarn('文件数量超出限制');
-            });
-        }
-    });*/
 
     var clipboard = new Clipboard('button.copy', {
         text: function (trigger) {
@@ -316,143 +283,3 @@
 </script>
 </body>
 </html>
-
-
-<!--<html>
-<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
-<style>
-    .img-class {
-        max-width: 525px;
-        max-height: 290px;
-    }
-    .img-paste-class {
-        width: 530px;
-        height: 330px;
-    }
-    .a-file input {
-        position: absolute;
-        font-size: 100px;
-        right: 0;
-        top: 0;
-        opacity: 0;
-    }
-
-</style>
-<head></head>
-<body>
-    <div class="control-group">
-        <div class="controls" style="position: relative;">
-            <div id="pasteShapeIcon" contenteditable="true" class="img-paste-class" title="粘贴上传图片">
-                <span id="pasteShapeIconTitle"></span>
-                <img id="photoPath" src="" class="img-class">
-            </div>
-        </div>
-    </div>
-</body>
-<script>
-
-    function isIE() {
-        if (!!window.ActiveXObject || "ActiveXObject" in window)
-            return true;
-        else
-            return false;
-    }
-    $(function () {
-        //照片不存在显示加载按钮
-        if ($("#photoPath").attr("src") == "") {
-            if (isIE()) {
-                $("#inputImg").show();
-                $("#pasteShapeIcon").hide();
-            } else {
-                $("#inputImg").hide();
-                document.getElementById("pasteShapeIcon").style.border = "dashed";
-                $("#pasteShapeIconTitle").text("在此框中粘贴图片");
-            }
-            $("#photoPath").hide();
-        } else {
-            if (isIE()) {
-                $("#inputImg").show();
-            }
-            document.getElementById("pasteShapeIcon").style.border = "0";
-            $("#pasteShapeIconTitle").text("");
-            document.getElementById("photoPath").style.border = "solid";
-            $("#photoPath").show();
-        }
-    });
-
-    if (!isIE()) {
-        document.getElementById('pasteShapeIcon').addEventListener("paste", function (event) {
-            paste_img(event);
-        }, false);
-    }
-
-    function paste_img(event) {
-        if (event.clipboardData || event.originalEvent) {
-            //not for ie11  某些chrome版本使用的是event.originalEvent
-            var clipboardData = (event.clipboardData || window.clipboardData || event.originalEvent.clipboardData);
-            if (clipboardData.items) {
-                var items = clipboardData.items,
-                    file = null;
-                //阻止默认行为即不让剪贴板内容在div中显示出来
-                event.preventDefault();
-                if (items && items.length) {
-                    // 搜索剪切板items
-                    for (var i = 0; i < items.length; i++) {
-                        if (items[i].type.indexOf('image') !== -1) {
-                            //getAsFile() 此方法只是living standard firefox ie11 并不支持
-                            file = items[i].getAsFile();
-                            break;
-                        }
-                    }
-                } else {
-                    log.innerHTML = '<span style="color:red;">当前浏览器不支持桌面图片复制和粘贴上传</span>';
-                    return;
-                }
-                if (!file) {
-                    log.innerHTML = '<span style="color:red;">粘贴内容非图片</span>';
-                    return;
-                } else {
-                    // 预览图片
-                    var reader = new FileReader()
-                    reader.onload = function (event) {
-                        document.getElementById("pasteShapeIcon").style.border = "0";
-                        $("#pasteShapeIconTitle").text("");
-                        document.getElementById("photoPath").style.border = "solid";
-                        $("#photoPath").show();
-                        $("#photoPath").attr("src", event.target.result);
-
-                    }
-                    reader.readAsDataURL(file);
-                    // 提示是否上传
-                    sendFile(file);
-                }
-            } else {
-                //其他不兼容的浏览器
-                log.innerHTML = '<span style="color:red;">当前浏览器不支持上传</span>';
-                return;
-            }
-        } else {
-            //ie 浏览器要手动上传
-            log.innerHTML = '<span style="color:red;">请选择图片提交上传</span>';
-            return;
-        }
-    }
-    //保存图片
-    function sendFile(file) {
-        var fd = new FormData();
-        fd.append("file", file);
-        $.ajax({
-            url: "http://localhost:8081/uploadShapeIcon",
-            type: "post",
-            data: fd,
-            processData: false,
-            contentType: false,
-            success: function (data) {
-                window.clearInterval(timer);
-                console.log("over..");
-            }
-        });
-    }
-</script>
-
-</html>-->
