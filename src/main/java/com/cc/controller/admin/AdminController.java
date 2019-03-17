@@ -390,7 +390,6 @@ public class AdminController {
         attach.setUrl("/static/upload/"+fileName);
         attach.setCreated(new Date());
         attachService.save(attach);
-
         return "succeed";
     }
 }
