@@ -392,4 +392,9 @@ public class AdminController {
         attachService.save(attach);
         return "succeed";
     }
+    @ResponseBody
+    @GetMapping("/out")
+    public String out(){
+        return "ddd";
+    }
 }
