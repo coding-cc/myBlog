@@ -11,7 +11,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,6 +21,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +43,7 @@ public class AdminController {
     private final UserService userService;
     private final CategoryService categoryService;
     private final MetaService metaService;
+    private final RelationshipsService relationshipsService;
 
 
     public AdminController(LogService logService,
@@ -51,7 +52,7 @@ public class AdminController {
                            AttachService attachService,
                            UserService userService,
                            CategoryService categoryService,
-                           MetaService metaService) {
+                           MetaService metaService, RelationshipsService relationshipsService) {
         this.logService = logService;
         this.contentService = contentService;
         this.commentsService = commentsService;
@@ -59,6 +60,7 @@ public class AdminController {
         this.userService = userService;
         this.categoryService = categoryService;
         this.metaService = metaService;
+        this.relationshipsService = relationshipsService;
     }
 
     @GetMapping(value = "logs")
@@ -178,22 +180,44 @@ public class AdminController {
     @PostMapping(value = "article/publish")
     @ResponseBody
     @SysLog(value = "发布文章")
+    @Transactional
     public ResultVO add(@RequestBody Contents content) {
         String tag = content.getTags();
-        boolean exist = metaService.exist(tag);
-        if(!exist){
-            Metas metas = new Metas();
-            metas.setName(tag);
-            metas.setType("tag");
-            metaService.save(metas);
-        }
+
         //初始化数据
         content.setHits(0);
         content.setAuthorId(1);
         content.setCommentsNum(0);
         content.setModified(content.getCreated());
         Contents result = contentService.save(content);
+        if(tag.contains(",")){
+            String[] tags = tag.split(",");
+            for (String t:tags
+                 ) {
+                saveRelationships(t, result.getCid());
+            }
+        } else {
+            saveRelationships(tag, result.getCid());
+        }
+
         return ResultUtils.success(result.getCid());
+    }
+    private void saveRelationships(String tag, Integer cid){
+        Metas meta = metaService.findByName(tag);
+        if(null==meta){
+            Metas metas = new Metas();
+            metas.setName(tag);
+            metas.setType("tag");
+            Relationships relationships = new Relationships();
+            relationships.setMid(metaService.save(metas).getMid());
+            relationships.setCid(cid);
+            relationshipsService.save(relationships);
+        } else {
+            Relationships relationships = new Relationships();
+            relationships.setMid(meta.getMid());
+            relationships.setCid(cid);
+            relationshipsService.save(relationships);
+        }
     }
 
     @PostMapping(value = "content/update")

@@ -21,4 +21,11 @@ public interface MetaService {
      */
     Metas save(Metas metas);
 
+    /**
+     * 根据标签名查id
+     * @param name
+     * @return
+     */
+    Metas findByName(String name);
+
 }

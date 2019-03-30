@@ -70,8 +70,8 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
-    public Page<Contents> pageByTag(String tag, Pageable pageable) {
-        return repository.findByTags(tag, pageable);
+    public Page<Contents> pageByMetaId(Integer mid, Pageable pageable) {
+        return repository.pageByMetaId(mid, pageable);
     }
 
     @Override

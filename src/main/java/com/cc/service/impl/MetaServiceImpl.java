@@ -28,4 +28,9 @@ public class MetaServiceImpl implements MetaService {
         return repository.save(metas);
     }
 
+    @Override
+    public Metas findByName(String name) {
+        return repository.findByName(name);
+    }
+
 }

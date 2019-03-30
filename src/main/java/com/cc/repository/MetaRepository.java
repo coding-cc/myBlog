@@ -17,4 +17,6 @@ public interface MetaRepository extends JpaRepository<Metas, Integer> {
      */
     boolean existsByName(String name);
 
+    Metas findByName(String name);
+
 }

@@ -66,5 +66,5 @@ public interface ContentService {
 
     Page<Contents> pageByCategory(String category, Pageable pageable);
 
-    Page<Contents> pageByTag(String tag, Pageable pageable);
+    Page<Contents> pageByMetaId(Integer mid, Pageable pageable);
 }

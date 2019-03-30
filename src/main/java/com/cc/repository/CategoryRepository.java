@@ -11,6 +11,12 @@ import java.util.List;
  */
 public interface CategoryRepository extends JpaRepository<Metas, Integer> {
 
+
+    /**
+     * 搜索
+     * @param type
+     * @return
+     */
     List<Metas> findAllByType(String type);
 
 }

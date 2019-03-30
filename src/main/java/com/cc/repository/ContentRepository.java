@@ -5,6 +5,7 @@ import com.cc.model.entity.Metas;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -83,10 +84,12 @@ public interface ContentRepository extends JpaRepository<Contents, Integer> {
     Page<Contents> findByCategories(String category, Pageable pageable);
 
     /**
-     * tag为指定的所有的Contents
-     * @param tag
+     * @param mid
      * @return
      */
-    Page<Contents> findByTags(String tag, Pageable pageable);
+    @Query(value = "select c from Contents c where c.cid in (select r.cid from Relationships r where r.mid=?1)")
+    Page<Contents> pageByMetaId(Integer mid, Pageable pageable);
+
+
 
 }

@@ -5,6 +5,8 @@ import com.cc.model.entity.Comments;
 import com.cc.model.entity.Contents;
 import com.cc.service.CommentsService;
 import com.cc.service.ContentService;
+import com.cc.service.MetaService;
+import com.cc.service.RelationshipsService;
 import com.cc.utils.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.commonmark.Extension;
@@ -49,6 +51,10 @@ public class ContentController {
     private CommentsService commentsService;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private RelationshipsService relationshipsService;
+    @Autowired
+    private MetaService metaService;
 
     @GetMapping(value = "article/{cid}")
     @Transactional
@@ -135,7 +141,8 @@ public class ContentController {
     public String tag(@PathVariable(value = "name") String name,
                         @RequestParam(value = "page", defaultValue = "1") Integer page,
                         ModelMap modelMap){
-        Page<Contents> contentsPage = contentService.pageByTag(name, PageRequest.of(page - 1, 6));
+        Integer mid = metaService.findByName(name).getMid();
+        Page<Contents> contentsPage = contentService.pageByMetaId(mid, PageRequest.of(page - 1, 6));
         modelMap.addAttribute("articles", contentsPage);
         modelMap.addAttribute("type", "标签");
         modelMap.addAttribute("keyword", name);

@@ -2,9 +2,7 @@ package com.cc.model.entity;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * 数据关系
@@ -16,10 +14,13 @@ import javax.persistence.Table;
 @Table(name = "t_relationships")
 public class Relationships{
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     /**
      * 文章主键
      */
-    @Id
     private Integer cid;
 
     /**

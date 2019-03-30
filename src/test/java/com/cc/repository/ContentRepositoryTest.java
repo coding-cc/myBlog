@@ -5,6 +5,7 @@ import com.cc.model.entity.Contents;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -46,6 +47,11 @@ public class ContentRepositoryTest extends BlogApplicationTests {
 
         DateTimeFormatter ftf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         System.out.println(ftf.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(1538830157),ZoneId.systemDefault())));
+    }
+
+    @Test
+    public void findAllTest(){
+        repository.pageByMetaId(29,PageRequest.of(0,1));
     }
 
 }
