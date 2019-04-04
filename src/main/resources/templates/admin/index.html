@@ -55,7 +55,7 @@
 
                                     <li class="list-group-item">
                                     <span class="badge badge-primary"
-                                  th:title="${article.commentsNum}+'条评论'" th:text="${article.commentsNum}"></span>
+                                          th:title="${article.commentsNum}+'条评论'" th:text="${article.commentsNum}"></span>
                                         <a target="_blank" th:text="${article.title}" th:href="@{'/article/' + ${article.cid}}"></a>
                                     </li>
                                 </ul>
@@ -161,16 +161,16 @@
                     url: '/cc/comments/1',
                     success: function (data) {
                         //未审核的评论显示在上面
-                            // $vm.comments = data.data
-                            // var temp = $vm.comments.content
-                            // $vm.noAuditComments = temp.filter(function (item) {
-                            //     if(item.status=='no_audit'){
-                            //         var index = temp.indexOf(item)
-                            //         temp.splice(index, 1)
-                            //         return item
-                            //     }
-                            // })
-                            // $vm.comments.content=$vm.noAuditComments.concat(temp)
+                        // $vm.comments = data.data
+                        // var temp = $vm.comments.content
+                        // $vm.noAuditComments = temp.filter(function (item) {
+                        //     if(item.status=='no_audit'){
+                        //         var index = temp.indexOf(item)
+                        //         temp.splice(index, 1)
+                        //         return item
+                        //     }
+                        // })
+                        // $vm.comments.content=$vm.noAuditComments.concat(temp)
                         var noAudit = data.data.content.filter(function (item) {
                             if(item.status=='no_audit') {
                                 return item
