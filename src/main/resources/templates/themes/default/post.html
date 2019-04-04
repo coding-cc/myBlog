@@ -2,7 +2,8 @@
 <th:block th:include="themes/default/partial/header.html :: header" xmlns:th="http://www.thymeleaf.org"></th:block>
 <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/showdown/1.3.0/showdown.min.js"></script>
-<script type="text/javascript">
+<script th:inline="javascript" type="text/javascript">
+    $("title").text([[${article.title}]])
 </script>
 <article class="main-content page-page" itemscope itemtype="http://schema.org/Article"
          xmlns:th="http://www.thymeleaf.org">
