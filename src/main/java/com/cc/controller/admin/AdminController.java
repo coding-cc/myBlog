@@ -268,14 +268,16 @@ public class AdminController {
     @GetMapping(value = "attaches/{authId}")
     @ResponseBody
     public ResultVO attaches(@PathVariable(value = "authId") Integer id, @RequestParam(defaultValue = "1") Integer page) {
-        Page<Attach> allContents = attachService.findAllByAuthid(id, PageRequest.of(page-1, 6));
+        Page<Attach> allContents = attachService.findAllByAuthid(id, PageRequest.of(page-1, 6, new Sort(Sort.Direction.DESC, "created")));
         return ResultUtils.success(allContents);
     }
+
 
     @GetMapping(value = "attaches")
     public String attaches() {
         return "admin/attaches.html";
     }
+
 
     @GetMapping(value = "comments")
     public String comments() {

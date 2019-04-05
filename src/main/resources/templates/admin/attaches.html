@@ -53,9 +53,9 @@
                 <div class="col-md-12 portlets">
                     <!-- Your awesome content goes here -->
                     <div class="m-b-30" id="pasteShapeIcon">
-                        <div action="#" class="dropzone" id="dropzone">
+                        <div action="#" class="dropzone">
                             <!--<div class="fallback">-->
-                                <!--<input name="file" type="file" multiple="multiple">-->
+                            <!--<input name="file" type="file" multiple="multiple">-->
                             <!--</div>-->
                             <div class="dz-message">
                                 <p>鼠标点击此处 Ctrl + V 即可上传图片</p>
@@ -67,8 +67,7 @@
                     </div>
                 </div>
                 <div class="col-md-12 attach">
-                    <!--<div v-if="attachPage.rows.length == 0" class="row">-->
-                    <div v-if="attachPage.length == 0" class="row">
+                    <div v-if="attachPage.content !=null && attachPage.content.length == 0" class="row">
                         <div class="col-md-4 text-center">
                             <div class="alert alert-warning">
                                 目前还没有一个附件呢，你可以上传试试!
@@ -76,12 +75,12 @@
                         </div>
                     </div>
 
-                    <div class="col-md-2 col-xs-6 text-center m-t-10" v-for="item in attachPage">
+                    <div class="col-md-2 col-xs-6 text-center m-t-10" v-for="item in attachPage.content">
                         <div class="img-show">
-                        <a :href="'/myImg'+item.url" target="_blank">
-                            <img v-if="item.ftype == 'image'" class="attach-img" :src="'/myImg'+item.url" :title="item.fname"/>
-                            <img v-if="item.ftype != 'image'" class="attach-img" src="/static/admin/images/attach.png" :title="item.fname"/>
-                        </a>
+                            <a :href="'/myImg'+item.url" target="_blank">
+                                <img v-if="item.ftype == 'image'" class="attach-img" :src="'/myImg'+item.url" :title="item.fname"/>
+                                <img v-if="item.ftype != 'image'" class="attach-img" src="/static/admin/images/attach.png" :title="item.fname"/>
+                            </a>
                         </div>
                         <div class="clearfix m-t-10">
                             <span class="attach-text" data-toggle="tooltip" data-placement="top" :data-original-title="item.fname">{{item.fname | truncate(15)}}</span>
@@ -100,19 +99,19 @@
 
                     <div class="clearfix"></div>
                     <ul class="pagination m-b-5 pull-right">
-                        <li v-if="attachPage.hasPrevPage">
-                            <a @click="load(attachPage.prevPage)" aria-label="Previous">
+                        <li v-if="!attachPage.first">
+                            <a @click="load(attachPage.number)" aria-label="Previous">
                                 <i class="fa fa-angle-left"></i>&nbsp;上一页
                             </a>
                         </li>
 
-                        <li class="page-item" v-for="num in attachPage.navPageNums" :class="{ active: attachPage.pageNum == num }">
+                        <li class="page-item" v-for="num in attachPage.totalPages" :class="{ active: attachPage.number+1 == num }">
                             <a @click="load(num)">
                                 {{ num }}</i>
                             </a>
                         </li>
-                        <li v-if="attachPage.hasNextPage">
-                            <a type="button" class="page-link" @click="load(attachPage.nextPage)">
+                        <li v-if="!attachPage.last">
+                            <a type="button" class="page-link" @click="load(attachPage.number+2)">
                                 下一页&nbsp;<i class="fa fa-angle-right"></i>
                             </a>
                         </li>
@@ -125,7 +124,6 @@
     </div>
 </div>
 <div th:include="admin/footer.html :: footer" xmlns:th="http://www.thymeleaf.org"></div>
-<script th:src="@{('/static/admin/plugins/dropzone/4.3.0/min/dropzone.min.js')}" xmlns:th="http://www.thymeleaf.org"></script>
 <script th:src="@{('/static/admin/plugins/clipboard.js/1.6.0/clipboard.min.js')}" xmlns:th="http://www.thymeleaf.org"></script>
 <script >
     var tale = new $.tale();
@@ -140,15 +138,15 @@
             vueLoding = this.$loading.show();
         },
         mounted: function () {
-            this.load();
+            this.load(1);
         },
         methods: {
-            load: function () {
+            load: function (num) {
                 var $vm = this;
                 tale.get({
-                    url: '/cc/attaches/1',
+                    url: '/cc/attaches/1?page='+num,
                     success: function (data) {
-                        $vm.attachPage = data.data.content
+                        $vm.attachPage = data.data
                     },
                     error: function (error) {
                         console.log(error);
@@ -178,12 +176,10 @@
         }
     });
 
-    Dropzone.autoDiscover = false;
-
 
     var clipboard = new Clipboard('button.copy', {
         text: function (trigger) {
-            return window.location.host+$(trigger).attr('src');
+            return window.location.protocol+'//'+window.location.host+$(trigger).attr('src');
         }
     });
 
@@ -274,7 +270,7 @@
             data: fd,
             processData: false,
             contentType: false,
-            success: function (data) {
+            success: function () {
                 window.location.reload();
             },
         });
